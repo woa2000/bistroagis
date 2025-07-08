@@ -115,7 +115,16 @@ export class MemStorage implements IStorage {
 
     mockUsers.forEach(user => {
       const id = this.currentUserId++;
-      this.users.set(id, { ...user, id, createdAt: new Date() });
+      this.users.set(id, { 
+        ...user, 
+        id, 
+        createdAt: new Date(),
+        description: user.description || null,
+        company: user.company || null,
+        phone: user.phone || null,
+        profileImage: null,
+        isActive: user.isActive ?? true
+      });
     });
 
     // Create mock event
@@ -130,7 +139,15 @@ export class MemStorage implements IStorage {
     };
 
     const eventId = this.currentEventId++;
-    this.events.set(eventId, { ...mockEvent, id: eventId, createdAt: new Date() });
+    this.events.set(eventId, { 
+      ...mockEvent, 
+      id: eventId, 
+      createdAt: new Date(),
+      description: mockEvent.description || null,
+      location: mockEvent.location || null,
+      isActive: mockEvent.isActive ?? true,
+      slotDuration: mockEvent.slotDuration || 30
+    });
 
     // Create mock meetings
     const mockMeetings: InsertMeeting[] = [
@@ -168,7 +185,20 @@ export class MemStorage implements IStorage {
 
     mockMeetings.forEach(meeting => {
       const id = this.currentMeetingId++;
-      this.meetings.set(id, { ...meeting, id, createdAt: new Date(), updatedAt: new Date() });
+      this.meetings.set(id, { 
+        ...meeting, 
+        id, 
+        createdAt: new Date(), 
+        updatedAt: new Date(),
+        duration: meeting.duration || 30,
+        result: meeting.result || null,
+        status: meeting.status || "pending",
+        location: meeting.location || null,
+        notes: meeting.notes || null,
+        eventId: meeting.eventId || null,
+        fabricanteId: meeting.fabricanteId || null,
+        revendedorId: meeting.revendedorId || null
+      });
     });
 
     // Create mock meeting requests
@@ -185,7 +215,18 @@ export class MemStorage implements IStorage {
 
     mockRequests.forEach(request => {
       const id = this.currentRequestId++;
-      this.meetingRequests.set(id, { ...request, id, createdAt: new Date(), updatedAt: new Date() });
+      this.meetingRequests.set(id, { 
+        ...request, 
+        id, 
+        createdAt: new Date(), 
+        updatedAt: new Date(),
+        status: request.status || "pending",
+        message: request.message || null,
+        eventId: request.eventId || null,
+        requesterId: request.requesterId || null,
+        targetId: request.targetId || null,
+        responseMessage: null
+      });
     });
 
     // Create mock notifications
@@ -215,7 +256,13 @@ export class MemStorage implements IStorage {
 
     mockNotifications.forEach(notification => {
       const id = this.currentNotificationId++;
-      this.notifications.set(id, { ...notification, id, createdAt: new Date() });
+      this.notifications.set(id, { 
+        ...notification, 
+        id, 
+        createdAt: new Date(),
+        userId: notification.userId || null,
+        isRead: notification.isRead ?? false
+      });
     });
   }
 
@@ -230,7 +277,16 @@ export class MemStorage implements IStorage {
 
   async createUser(user: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    const newUser: User = { ...user, id, createdAt: new Date() };
+    const newUser: User = { 
+      ...user, 
+      id, 
+      createdAt: new Date(),
+      company: user.company || null,
+      phone: user.phone || null,
+      profileImage: user.profileImage || null,
+      description: user.description || null,
+      isActive: user.isActive ?? true
+    };
     this.users.set(id, newUser);
     return newUser;
   }
@@ -259,7 +315,15 @@ export class MemStorage implements IStorage {
 
   async createEvent(event: InsertEvent): Promise<Event> {
     const id = this.currentEventId++;
-    const newEvent: Event = { ...event, id, createdAt: new Date() };
+    const newEvent: Event = { 
+      ...event, 
+      id, 
+      createdAt: new Date(),
+      description: event.description || null,
+      location: event.location || null,
+      isActive: event.isActive ?? true,
+      slotDuration: event.slotDuration || 30
+    };
     this.events.set(id, newEvent);
     return newEvent;
   }
@@ -283,7 +347,15 @@ export class MemStorage implements IStorage {
       ...meeting, 
       id, 
       createdAt: new Date(), 
-      updatedAt: new Date() 
+      updatedAt: new Date(),
+      duration: meeting.duration || 30,
+      result: meeting.result || null,
+      status: meeting.status || "pending",
+      location: meeting.location || null,
+      notes: meeting.notes || null,
+      eventId: meeting.eventId || null,
+      fabricanteId: meeting.fabricanteId || null,
+      revendedorId: meeting.revendedorId || null
     };
     this.meetings.set(id, newMeeting);
     return newMeeting;
@@ -327,7 +399,13 @@ export class MemStorage implements IStorage {
       ...request, 
       id, 
       createdAt: new Date(), 
-      updatedAt: new Date() 
+      updatedAt: new Date(),
+      status: request.status || "pending",
+      message: request.message || null,
+      eventId: request.eventId || null,
+      requesterId: request.requesterId || null,
+      targetId: request.targetId || null,
+      responseMessage: request.responseMessage || null
     };
     this.meetingRequests.set(id, newRequest);
     return newRequest;
@@ -364,7 +442,9 @@ export class MemStorage implements IStorage {
     const newNotification: Notification = { 
       ...notification, 
       id, 
-      createdAt: new Date() 
+      createdAt: new Date(),
+      userId: notification.userId || null,
+      isRead: notification.isRead ?? false
     };
     this.notifications.set(id, newNotification);
     return newNotification;

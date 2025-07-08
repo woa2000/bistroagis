@@ -2,14 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 export function useAuth() {
+  const token = localStorage.getItem("authToken");
+  
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/user"],
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!token, // Only run query if token exists
   });
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
     if (token) {
       // Set auth header for requests
       const originalFetch = window.fetch;
@@ -24,12 +26,12 @@ export function useAuth() {
         });
       };
     }
-  }, []);
+  }, [token]);
 
   return {
     user,
     isLoading,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && !!token,
     error,
   };
 }
