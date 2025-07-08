@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRD Interativo - Plataforma de Agendamento de Reuniões</title>
+    <style>
+        /* Importa uma fonte moderna do Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        /* Variáveis de Cores para fácil customização */
+        :root {
+            --primary-color: #0a2463; /* Azul Escuro (cor principal) */
+            --secondary-color: #3e92cc; /* Azul Claro (cor de destaque) */
+            --text-color: #333333; /* Cor do texto principal */
+            --background-color: #f4f7f6; /* Cor de fundo suave */
+            --container-background: #ffffff; /* Fundo do container principal */
+            --border-color: #e0e0e0;
+            --success-color: #28a745;
+            --view-only-color: #ffc107; /* Amarelo para destaque de "view-only" */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .prd-container {
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: var(--container-background);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        header .logo {
+            max-height: 55px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 6px;
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2.4em;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            margin: 8px 0 0;
+            font-size: 1.1em;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        main {
+            padding: 40px 50px;
+        }
+
+        section {
+            margin-bottom: 45px;
+            padding-bottom: 35px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.75em;
+            font-weight: 600;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+
+        h3 {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-top: 35px;
+            margin-bottom: 15px;
+        }
+        
+        strong {
+            font-weight: 600;
+        }
+
+        ul, ol {
+            padding-left: 25px;
+        }
+
+        ul li, ol li {
+            margin-bottom: 12px;
+            padding-left: 5px;
+        }
+        
+        ul {
+            list-style-type: '✓ ';
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        thead th {
+            background-color: #f8f9fa;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.05em;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .card {
+            background-color: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--secondary-color);
+            padding: 25px;
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.07);
+        }
+
+        .card.view-only {
+             border-top-color: var(--view-only-color);
+        }
+
+        .card h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-size: 1.15em;
+        }
+        
+        code {
+            background-color: #e8e8e8;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        footer {
+            background-color: #333333;
+            color: #dddddd;
+            text-align: center;
+            padding: 25px;
+            font-size: 0.9em;
+        }
+        
+        /* --- Estilos para o modo de edição --- */
+        #edit-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        #edit-toggle-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1em;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        #edit-toggle-button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        #edit-toggle-button.editing {
+            background-color: var(--success-color);
+        }
+
+        /* Estilização dos elementos quando o modo de edição está ativo */
+        .editing-active [contenteditable="true"] {
+            outline: 2px dashed var(--secondary-color);
+            outline-offset: 3px;
+            background-color: #e3f2fd !important; /* Um azul bem claro para destaque */
+            border-radius: 4px;
+            cursor: text;
+            transition: background-color 0.3s ease;
+        }
+
+        .editing-active [contenteditable="true"]:hover {
+            background-color: #bbdefb !important; /* Um pouco mais escuro no hover */
+        }
+
+        /* Media Query para Responsividade */
+        @media (max-width: 768px) {
+            main {
+                padding: 30px 25px;
+            }
+            header {
+                padding: 30px 20px;
+            }
+            header h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.5em;
+            }
+            #edit-controls {
+                top: 10px;
+                right: 10px;
+            }
+            #edit-toggle-button {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Botão para ativar/desativar edição -->
+    <div id="edit-controls">
+        <button id="edit-toggle-button">Ativar Edição</button>
+    </div>
+
+    <div class="prd-container">
+        <header>
+            <div class="logo-container">
+                <img src="https://placehold.co/150x55/FFFFFF/0a2463?text=Sua+Empresa" alt="Logo Empresa" class="logo" onerror="this.onerror=null;this.src='https://placehold.co/150x55/FFFFFF/0a2463?text=Logo+1';">
+            </div>
+            <h1>Documento de Requisitos de Produto (PRD)</h1>
+            <p><strong>Projeto: Plataforma de Agendamento de Reuniões v1.2</strong></p>
+            <p><strong>Autor: [Nome do Product Manager]</strong> | <strong>Status: Rascunho</strong> | <strong>Última Atualização: 08 de Julho de 2025</strong></p>
+        </header>
+
+        <main>
+            <section id="sumario">
+                <h2>1. Sumário Executivo</h2>
+                <p>
+                    Este documento detalha os requisitos para a <strong>Plataforma de Agendamento de Reuniões</strong>. Nosso objetivo é resolver o problema de <strong>complexidade e ineficiência no agendamento de reuniões 1-a-1 em eventos B2B</strong> através da implementação de uma <strong>plataforma web responsiva que automatiza a criação de agendas, elimina conflitos e centraliza a comunicação</strong>.
+                </p>
+                <p>
+                    Com esta iniciativa, esperamos atingir uma <strong>redução drástica no esforço operacional da equipe de produção e um aumento significativo no número de reuniões relevantes realizadas</strong>. Este projeto está alinhado com nossos objetivos estratégicos de melhorar a experiência do cliente e otimizar operações em eventos.
+                </p>
+            </section>
+
+            <section id="problema">
+                <h2>2. Problema a ser Resolvido</h2>
+                <p>Eventos B2B, especialmente rodadas de negócios, dependem criticamente da organização de reuniões individuais entre fabricantes (expositores) e revendedores (compradores). Atualmente, esse processo é predominantemente manual, baseado em planilhas complexas, trocas de e-mails e chamadas telefônicas.</p>
+                <h3>Evidências e Impacto</h3>
+                <ul>
+                    <li><strong>Ineficiência Operacional:</strong> A equipe de produção investe centenas de horas para cruzar interesses, alocar horários e resolver conflitos manualmente.</li>
+                    <li><strong>Alta Taxa de Erros:</strong> O processo manual resulta em duplicações, sobreposições de horários e encontros desalinhados com as prioridades dos participantes.</li>
+                    <li><strong>Experiência Negativa:</strong> Fabricantes e revendedores sofrem com a falta de visibilidade de suas agendas, dificuldade em solicitar alterações e ausência de lembretes, levando a desencontros e frustração.</li>
+                    <li><strong>Falta de Dados:</strong> É quase impossível extrair dados confiáveis sobre o engajamento e o sucesso das reuniões para análise pós-evento.</li>
+                </ul>
+            </section>
+            
+            <section id="objetivos">
+                <h2>3. Objetivos e Métricas de Sucesso</h2>
+                <p>
+                    O objetivo principal (North Star) deste projeto é <strong>maximizar o número de reuniões de alto valor realizadas durante um evento, com o mínimo de esforço operacional</strong>. Para medir o sucesso, acompanharemos as seguintes métricas:
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Métrica (KPI)</th>
+                            <th>Situação Atual (Baseline)</th>
+                            <th>Meta (v1.0)</th>
+                            <th>Período</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Tempo de criação da agenda (evento de 100x500)</td>
+                            <td>~40 horas/homem</td>
+                            <td>&lt; 10 minutos</td>
+                            <td>Por evento</td>
+                        </tr>
+                         <tr>
+                            <td>Taxa de conflitos de agenda</td>
+                            <td>~15%</td>
+                            <td>≤ 2%</td>
+                            <td>Pós-geração automática</td>
+                        </tr>
+                        <tr>
+                            <td>Taxa de comparecimento (check-in)</td>
+                            <td>~70%</td>
+                            <td>≥ 85%</td>
+                            <td>Final do evento</td>
+                        </tr>
+                         <tr>
+                            <td>NPS (Net Promoter Score) dos usuários</td>
+                            <td>N/A</td>
+                            <td>≥ 45</td>
+                            <td>Pós-evento</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+             <section id="pilares">
+                <h2>4. Pilares da Solução</h2>
+                <p>Para atingir nossos objetivos, a solução será construída sobre os seguintes pilares:</p>
+                <div class="card-container">
+                    <div class="card">
+                        <h4>Agendamento Inteligente</h4>
+                        <p>Um algoritmo robusto que aloca reuniões automaticamente, respeitando prioridades, maximizando encontros relevantes e eliminando conflitos de horário.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Gestão Centralizada e Flexível</h4>
+                        <p>Uma interface intuitiva para a equipe de produção gerenciar todos os aspectos do evento, desde a importação de dados até ajustes manuais na agenda.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Monitoramento e Análise</h4>
+                        <p>Ferramentas para que a empresa organizadora (Agis) monitore o sucesso das negociações em tempo real, com base nos resultados inseridos pelos participantes.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="publico">
+                <h2>5. Público-Alvo e Personas</h2>
+                <p>Esta funcionalidade impactará principalmente as seguintes personas:</p>
+                <div class="card-container">
+                    <div class="card">
+                        <h4>Produção</h4>
+                        <p>Equipe interna com poder de edição total. Configura o evento, importa participantes, gera e ajusta agendas para garantir a operação.</p>
+                    </div>
+                    <div class="card view-only">
+                        <h4>Agis (Monitoramento)</h4>
+                        <p>Empresa organizadora que monitora o andamento do evento. Precisa de uma visão completa das agendas e dos resultados das negociações, mas sem permissão para editar.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Fabricante</h4>
+                        <p>Expositor que deseja se encontrar com revendedores. Precisa definir suas prioridades, ter uma visão clara de sua agenda e registrar os resultados das reuniões.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Revenda</h4>
+                        <p>Visitante comprador. Precisa ter acesso fácil à sua agenda de reuniões e registrar os resultados do seu ponto de vista.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="escopo">
+                <h2>6. Escopo da Solução</h2>
+                
+                <h3>6.1. Funcionalidades Obrigatórias (MVP)</h3>
+                <ol>
+                    <li><strong>Gestão de Eventos:</strong> Criação de eventos com datas, horários e duração de slots.</li>
+                    <li><strong>Importação de Dados:</strong> Upload de planilhas (.xlsx, .csv) de Fabricantes, Revendas e seus relacionamentos.</li>
+                    <li><strong>Geração de Agenda:</strong> Algoritmo para criação automática da grade de horários.</li>
+                    <li><strong>Visualização de Agendas:</strong> Telas para cada perfil visualizar sua agenda.</li>
+                    <li><strong>Ajuste Manual (Produção):</strong> Ferramenta de drag-and-drop para a Produção ajustar a agenda.</li>
+                    <li><strong>Registro de Resultado da Reunião:</strong> Funcionalidade para Fabricante/Revenda informarem o status pós-reunião.</li>
+                    <li><strong>Painel de Monitoramento (Agis):</strong> Dashboard com estatísticas em tempo real dos resultados das reuniões.</li>
+                    <li><strong>Notificações Essenciais:</strong> Envio de lembretes por e-mail e WhatsApp.</li>
+                    <li><strong>Gestão de Usuários e Perfis:</strong> Sistema de login e permissões para cada persona.</li>
+                </ol>
+                
+                <h3>6.2. Fora de Escopo (v1.0)</h3>
+                <ul>
+                    <li>Integração com CRMs externos (ex: Salesforce, HubSpot).</li>
+                    <li>Funcionalidades de pagamento ou monetização.</li>
+                    <li>Aplicativo móvel nativo (a solução será web responsiva).</li>
+                    <li>Relatórios analíticos avançados e históricos (além do painel em tempo real).</li>
+                </ul>
+            </section>
+
+            <section id="permissoes">
+                <h2>7. Matriz de Permissões</h2>
+                <p>A tabela abaixo define as ações permitidas para cada perfil de usuário na plataforma.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ação / Perfil</th>
+                            <th style="text-align: center;">Produção</th>
+                            <th style="text-align: center;">Agis</th>
+                            <th style="text-align: center;">Fabricante</th>
+                            <th style="text-align: center;">Revenda</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Criar/Editar Evento</td>
+                            <td style="text-align: center;">✔️</td>
+                            <td style="text-align: center;">❌</td>
+                            <td style="text-align: center;">❌</td>
+                            <td style="text-align: center;">❌</td>
+                        </tr>
+                        <tr>
+                            <td>Importar Participantes</td>
+                            <td style="text-align: center;">✔️</td>
+                            <td style="text-align: center;">❌</td>
+                            <td style="text-align: center;">❌</td>
+                            <td style="text-align: center;">❌</td>
+                        </tr>
+                        <tr>
+                            <td>Gerar/Ajustar Agenda</td>
+                            <td style="text-align: center;">✔️</td>
+                            <td style="text-align: center;">❌</td>
+                            <td style="text-align: center;">❌</td>
+                            <td style="text-align: center;">❌</td>
+                        </tr>
+                        <tr>
+                            <td>Visualizar Todas as Agendas</td>
+                            <td style="text-align: center;">✔️</td>
+                            <td style="text-align: center;">✔️</td>
+                            <td style="text-align: center;">❌</td>
+                            <td style="text-align: center;">❌</td>
+                        </tr>
+                        <tr>
+                            <td>Visualizar Agenda Própria</td>
+                            <td style="text-align: center;">✔️</td>
+                            <td style="text-align: center;">✔️</td>
+                            <td style="text-align: center;">✔️</td>
+                            <td style="text-align: center;">✔️</td>
+                        </tr>
+                        <tr>
+                            <td>Registrar Resultado de Reunião</td>
+                            <td style="text-align: center;">❌</td>
+                            <td style="text-align: center;">❌</td>
+                            <td style="text-align: center;">✔️</td>
+                            <td style="text-align: center;">✔️</td>
+                        </tr>
+                        <tr>
+                            <td>Ver Painel de Resultados</td>
+                            <td style="text-align: center;">✔️</td>
+                            <td style="text-align: center;">✔️</td>
+                            <td style="text-align: center;">❌</td>
+                            <td style="text-align: center;">❌</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="requisitos">
+                <h2>8. Requisitos da Solução</h2>
+                
+                <h3>8.1. Requisitos Funcionais (User Stories)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User Story</th>
+                            <th>Prioridade</th>
+                            <th>Critérios de Aceitação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>FR-01</strong></td>
+                            <td>Como <strong>Produção</strong>, quero <strong>importar uma planilha de Fabricantes</strong> para não cadastrar um por um.</td>
+                            <td>Alta</td>
+                            <td><code>Dado que</code> estou na tela de importação,<br><code>Quando</code> eu subo um arquivo .xlsx com os cabeçalhos corretos,<br><code>Então</code> o sistema valida os dados e cadastra os fabricantes com sucesso.</td>
+                        </tr>
+                         <tr>
+                            <td><strong>FR-02</strong></td>
+                            <td>Como <strong>Produção</strong>, quero <strong>arrastar e soltar uma reunião</strong> para outro horário vago para atender a uma solicitação de ajuste.</td>
+                            <td>Alta</td>
+                            <td><code>Dado que</code> estou na visão de agenda de um Fabricante,<br><code>Quando</code> eu arrasto uma reunião para um slot vazio compatível,<br><code>Então</code> a agenda é atualizada em tempo real para todos os envolvidos.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>FR-03</strong></td>
+                            <td>Como <strong>Fabricante</strong>, quero <strong>visualizar minha agenda no celular</strong> para saber meus próximos encontros.</td>
+                            <td>Alta</td>
+                            <td><code>Dado que</code> estou logado como Fabricante,<br><code>Quando</code> acesso a "Minha Agenda" em um dispositivo móvel,<br><code>Então</code> vejo uma lista cronológica das minhas reuniões.</td>
+                        </tr>
+                         <tr>
+                            <td><strong>FR-04</strong></td>
+                            <td>Como <strong>Fabricante</strong>, quero <strong>registrar o resultado de uma reunião</strong> para formalizar a negociação.</td>
+                            <td>Alta</td>
+                            <td><code>Dado que</code> uma reunião em minha agenda já ocorreu,<br><code>Quando</code> eu seleciono a reunião,<br><code>Então</code> posso escolher um resultado de uma lista pré-definida (ex: 'Negócio Fechado', 'Follow-up') e salvar.</td>
+                        </tr>
+                         <tr>
+                            <td><strong>FR-05</strong></td>
+                            <td>Como <strong>Agis</strong>, quero <strong>visualizar um painel com as estatísticas dos resultados das reuniões</strong> em tempo real.</td>
+                            <td>Alta</td>
+                            <td><code>Dado que</code> estou logado como Agis,<br><code>Quando</code> acesso o "Painel de Resultados",<br><code>Então</code> vejo gráficos simples mostrando a distribuição de resultados das reuniões (ex: % de 'Negócio Fechado').</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>8.2. Requisitos Não Funcionais</h3>
+                <ul>
+                    <li><strong>Responsividade:</strong> A plataforma deve ser mobile-first, com suporte a larguras de tela a partir de 360px.</li>
+                    <li><strong>Performance:</strong> Geração de agenda para 1000+ relacionamentos deve ocorrer em menos de 60 segundos. Carregamento de páginas em até 2s.</li>
+                    <li><strong>Segurança:</strong> Autenticação via JWT, senhas com hash, comunicação via HTTPS e conformidade com a LGPD.</li>
+                    <li><strong>Escalabilidade:</strong> Arquitetura projetada para suportar picos de 2.000 usuários simultâneos durante os eventos.</li>
+                    <li><strong>Disponibilidade:</strong> Uptime de 99,5% durante o período de funcionamento do evento.</li>
+                </ul>
+            </section>
+
+            <section id="dependencias">
+                 <h2>9. Dependências e Riscos</h2>
+                 <h3>Dependências</h3>
+                 <ul>
+                     <li><strong>Externa:</strong> Contratação e configuração de uma API oficial do WhatsApp (ex: Meta Cloud API) para o envio de notificações.</li>
+                     <li><strong>Infraestrutura:</strong> Provisionamento de ambiente em nuvem (ex: AWS com RDS, S3, SES) capaz de atender aos requisitos de escalabilidade.</li>
+                 </ul>
+                 <h3>Riscos e Planos de Mitigação</h3>
+                 <table>
+                       <thead>
+                           <tr>
+                               <th>Risco</th>
+                               <th>Probabilidade</th>
+                               <th>Impacto</th>
+                               <th>Plano de Mitigação</th>
+                           </tr>
+                       </thead>
+                       <tbody>
+                           <tr>
+                               <td>Falha ou instabilidade na API do WhatsApp</td>
+                               <td>Média</td>
+                               <td>Alto</td>
+                               <td>Implementar um sistema de fallback para envio de notificações por e-mail e, secundariamente, por SMS.</td>
+                           </tr>
+                           <tr>
+                               <td>Importação de planilhas com dados mal formatados</td>
+                               <td>Alta</td>
+                               <td>Médio</td>
+                               <td>Desenvolver um validador robusto com mensagens de erro claras e fornecer templates de exemplo para download.</td>
+                           </tr>
+                           <tr>
+                               <td>Sobrecarga do sistema no dia do evento</td>
+                               <td>Média</td>
+                               <td>Crítico</td>
+                               <td>Realizar testes de carga, utilizar CDN para assets estáticos e configurar auto-scaling para a aplicação.</td>
+                           </tr>
+                       </tbody>
+                 </table>
+            </section>
+
+            <section id="cronograma">
+                <h2>10. Cronograma e Marcos (Ajustado para Go-Live em Agosto)</h2>
+                <p><strong>Atenção:</strong> Este é um cronograma acelerado para atender à data de lançamento no final de agosto. Requer foco total no escopo do MVP e alocação de recursos dedicada.</p>
+                 <ol>
+                     <li><strong>Fase 1: Planejamento e Design (Até 18 de Julho)</strong> - Saída: Wireframes e arquitetura da solução aprovados.</li>
+                     <li><strong>Fase 2: Desenvolvimento do Core (Até 08 de Agosto)</strong> - Saída: Funcionalidades de gestão, importação e geração de agenda (MVP).</li>
+                     <li><strong>Fase 3: UI, Notificações e Painéis (Até 22 de Agosto)</strong> - Saída: Interfaces de visualização, registro de resultados e painel de monitoramento.</li>
+                     <li><strong>Fase 4: Testes Finais e Lançamento (Até 29 de Agosto)</strong> - Saída: Implantação em produção e suporte ao evento-piloto.</li>
+                 </ol>
+            </section>
+            
+            <section id="anexos">
+                <h2>11. Anexos e Glossário</h2>
+                <h3>Glossário</h3>
+                <ul>
+                    <li><strong>Slot:</strong> Intervalo de tempo (ex: 15 min) reservado para um encontro 1-a-1.</li>
+                    <li><strong>Relacionamento:</strong> O interesse formalizado de um Fabricante em se reunir com uma Revenda específica.</li>
+                    <li><strong>Agis:</strong> Empresa organizadora do evento, responsável pelo monitoramento das negociações. Possui visão completa, mas sem permissão de edição.</li>
+                    <li><strong>Produção:</strong> Equipe com acesso administrativo para configurar, gerar e ajustar as agendas do evento.</li>
+                </ul>                
+            </section>
+        </main>
+
+        <footer>
+            <p><strong>[Nome da Empresa]</strong> - Documento de Produto</p>
+            <p>Este documento é confidencial e de propriedade da [Nome da Empresa].</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const editButton = document.getElementById('edit-toggle-button');
+            const prdContainer = document.querySelector('.prd-container');
+            let isEditing = false;
+
+            // Lista de seletores para os elementos que serão editáveis.
+            const editableSelectors = [
+                '.prd-container header p strong',
+                '#sumario p',
+                '#problema p', '#problema ul li',
+                '#objetivos tbody td',
+                '.card h4', '.card p',
+                '#publico .card p',
+                '#escopo ol li', '#escopo ul li',
+                '#requisitos tbody td', '#requisitos ul li',
+                '#dependencias ul li', '#dependencias table td',
+                '#cronograma ol li', '#cronograma p',
+                '#anexos ul li', '#anexos ul li a',
+                'footer p'
+            ];
+
+            const elementsToEdit = document.querySelectorAll(editableSelectors.join(', '));
+
+            editButton.addEventListener('click', () => {
+                isEditing = !isEditing;
+                prdContainer.classList.toggle('editing-active'); // Adiciona classe ao container para estilização
+
+                if (isEditing) {
+                    editButton.textContent = 'Concluir Edição';
+                    editButton.classList.add('editing');
+
+                    elementsToEdit.forEach(el => {
+                        el.setAttribute('contenteditable', 'true');
+                        if (el.tagName === 'A') {
+                            el.dataset.href = el.href;
+                            el.removeAttribute('href');
+                        }
+                    });
+                } else {
+                    editButton.textContent = 'Ativar Edição';
+                    editButton.classList.remove('editing');
+
+                    elementsToEdit.forEach(el => {
+                        el.setAttribute('contenteditable', 'false');
+                        if (el.tagName === 'A' && el.dataset.href) {
+                            el.setAttribute('href', el.dataset.href);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
