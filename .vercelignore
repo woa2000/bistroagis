@@ -1,0 +1,23 @@
+# Arquivos de desenvolvimento
+node_modules
+.git
+.env.local
+.env.development
+*.log
+
+# Arquivos do Replit
+.replit
+replit.nix
+replit.md
+
+# Arquivos temporários
+.DS_Store
+*.tmp
+*.temp
+
+# Build local
+dist/server
+server/index.js
+
+# Assets não necessários
+attached_assets/

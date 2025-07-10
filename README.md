@@ -26,7 +26,13 @@ Sistema de gerenciamento de reuniões e eventos para feiras e exposições.
 3. Conecte seu repositório Git
 4. Selecione o repositório `bistroagis`
 
-#### Passo 2: Configurar Variáveis de Ambiente
+#### Passo 2: Configurar Build
+**⚠️ IMPORTANTE**: Configure as seguintes opções no Vercel:
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist/public`
+- **Install Command**: `npm install`
+
+#### Passo 3: Configurar Variáveis de Ambiente
 No dashboard do Vercel, na seção **Environment Variables**, adicione:
 
 ```bash
@@ -40,16 +46,31 @@ NODE_ENV=production
 openssl rand -base64 32
 ```
 
-#### Passo 3: Deploy Automático
-- O Vercel detectará automaticamente a configuração
+#### Passo 4: Deploy Automático
+- O Vercel detectará automaticamente a configuração do `vercel.json`
 - O build será executado usando `npm run build`
 - A aplicação será publicada automaticamente
 
-#### Passo 4: Configurar Banco de Dados
-Após o primeiro deploy, configure o banco:
+#### Passo 5: Configurar Banco de Dados
+Após o primeiro deploy, configure o banco executando localmente:
 ```bash
 npm run db:push
 ```
+
+### 🔧 Solução de Problemas Específicos do Deploy
+
+#### ❌ Erro 404: NOT_FOUND
+Se você receber este erro:
+1. Verifique se o **Output Directory** está configurado como `dist/public`
+2. Confirme que o build foi executado com sucesso
+3. Verifique os logs de build no dashboard do Vercel
+4. Force um novo deploy: vá em **Deployments** > **Redeploy**
+
+#### ❌ Problemas de API
+Se as APIs não funcionarem:
+1. Verifique se as variáveis `DATABASE_URL` e `SESSION_SECRET` estão configuradas
+2. Confirme que o arquivo `api/index.ts` está sendo reconhecido
+3. Teste as rotas da API diretamente: `https://seudominio.vercel.app/api/auth/user`
 
 ### 🏠 Desenvolvimento Local
 
