@@ -29,7 +29,7 @@ Sistema de gerenciamento de reuniões e eventos para feiras e exposições.
 #### Passo 2: Configurar Build
 **⚠️ IMPORTANTE**: Configure as seguintes opções no Vercel:
 - **Build Command**: `npm run build`
-- **Output Directory**: `dist/public`
+- **Output Directory**: `dist`
 - **Install Command**: `npm install`
 
 #### Passo 3: Configurar Variáveis de Ambiente
@@ -61,10 +61,11 @@ npm run db:push
 
 #### ❌ Erro 404: NOT_FOUND
 Se você receber este erro:
-1. Verifique se o **Output Directory** está configurado como `dist/public`
+1. Verifique se o **Output Directory** está configurado como `dist` (não `dist/public`)
 2. Confirme que o build foi executado com sucesso
 3. Verifique os logs de build no dashboard do Vercel
 4. Force um novo deploy: vá em **Deployments** > **Redeploy**
+5. Teste acessando `/test.html` primeiro para verificar se arquivos estáticos funcionam
 
 #### ❌ Problemas de API
 Se as APIs não funcionarem:
