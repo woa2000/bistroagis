@@ -1,7 +1,0 @@
-export default {
-  buildCommand: 'npm run build',
-  outputDirectory: 'dist',
-  installCommand: 'npm install',
-  devCommand: 'npm run dev',
-  framework: null
-};

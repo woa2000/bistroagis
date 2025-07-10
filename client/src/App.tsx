@@ -19,8 +19,6 @@ import NotFound from "@/pages/not-found";
 function AppContent() {
   const { user, isLoading, error } = useAuth();
 
-  console.log("Auth state:", { user, isLoading, error });
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -33,7 +31,6 @@ function AppContent() {
   }
 
   if (error) {
-    console.error("Auth error:", error);
     // Se houver erro de autenticação, limpa token e vai para login
     localStorage.removeItem("authToken");
   }
@@ -67,8 +64,6 @@ function AppContent() {
 }
 
 function App() {
-  console.log("App starting...");
-  
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
