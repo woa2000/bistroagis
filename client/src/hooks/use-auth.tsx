@@ -10,6 +10,30 @@ export function useAuth() {
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: !!token, // Only run query if token exists
+    queryFn: async () => {
+      try {
+        const response = await fetch("/api/auth/user", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        
+        if (!response.ok) {
+          if (response.status === 401) {
+            // Token inválido, remove do localStorage
+            localStorage.removeItem("authToken");
+            return null;
+          }
+          throw new Error(`${response.status}: ${response.statusText}`);
+        }
+        
+        return await response.json();
+      } catch (err) {
+        console.warn("Auth check failed:", err);
+        // Em caso de erro de rede ou API, não falha completamente
+        return null;
+      }
+    },
   });
 
   useEffect(() => {

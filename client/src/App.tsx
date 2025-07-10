@@ -17,14 +17,25 @@ import MobileNav from "@/components/layout/mobile-nav";
 import NotFound from "@/pages/not-found";
 
 function AppContent() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, error } = useAuth();
+
+  console.log("Auth state:", { user, isLoading, error });
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        <div className="ml-4">
+          <p>Carregando...</p>
+        </div>
       </div>
     );
+  }
+
+  if (error) {
+    console.error("Auth error:", error);
+    // Se houver erro de autenticação, limpa token e vai para login
+    localStorage.removeItem("authToken");
   }
 
   if (!user) {
@@ -56,6 +67,8 @@ function AppContent() {
 }
 
 function App() {
+  console.log("App starting...");
+  
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
