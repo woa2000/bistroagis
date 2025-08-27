@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Calendar, Mail, Users, BarChart3, User } from "lucide-react";
+import { Home, Calendar, CalendarDays, Mail, Users, BarChart3, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 export default function Sidebar() {
   const [location] = useLocation();
 
-  const { data: requests = [] } = useQuery({
+  const { data: requests = [] } = useQuery<any[]>({
     queryKey: ["/api/meeting-requests/pending"],
   });
 
@@ -15,6 +15,7 @@ export default function Sidebar() {
 
   const navigation = [
     { name: "Dashboard", href: "/", icon: Home },
+    { name: "Agenda do Dia", href: "/schedule", icon: CalendarDays },
     { name: "Minhas Reuniões", href: "/meetings", icon: Calendar },
     { 
       name: "Solicitações", 

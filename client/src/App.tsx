@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import Meetings from "@/pages/meetings";
+import Schedule from "@/pages/schedule";
 import Requests from "@/pages/requests";
 import Participants from "@/pages/participants";
 import Analytics from "@/pages/analytics";
@@ -49,6 +50,7 @@ function AppContent() {
             <Switch>
               <Route path="/" component={Dashboard} />
               <Route path="/meetings" component={Meetings} />
+              <Route path="/schedule" component={Schedule} />
               <Route path="/requests" component={Requests} />
               <Route path="/participants" component={Participants} />
               <Route path="/analytics" component={Analytics} />

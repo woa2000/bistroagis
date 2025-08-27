@@ -1,19 +1,20 @@
 import { Link, useLocation } from "wouter";
-import { Home, Calendar, Mail, Users } from "lucide-react";
+import { Home, Calendar, CalendarDays, Mail, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 
 export default function MobileNav() {
   const [location] = useLocation();
 
-  const { data: requests = [] } = useQuery({
+  const { data: requests = [] } = useQuery<any[]>({
     queryKey: ["/api/meeting-requests/pending"],
   });
 
-  const pendingCount = requests.length;
+  const pendingCount = (requests as any[]).length;
 
   const navigation = [
     { name: "Dashboard", href: "/", icon: Home },
+    { name: "Agenda", href: "/schedule", icon: CalendarDays },
     { name: "Reuniões", href: "/meetings", icon: Calendar },
     { 
       name: "Solicitações", 

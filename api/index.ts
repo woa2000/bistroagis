@@ -47,6 +47,66 @@ const mockUsers = [
     description: "Fabricação de componentes eletrônicos",
     isActive: true,
     createdAt: new Date()
+  },
+  {
+    id: 3,
+    email: "maria@techsolutions.com",
+    password: "123456",
+    name: "Maria Santos",
+    company: "Tech Solutions",
+    phone: "(11) 8888-8888",
+    userType: "fabricante",
+    description: "Soluções tecnológicas inovadoras",
+    isActive: true,
+    createdAt: new Date()
+  },
+  {
+    id: 4,
+    email: "pedro@innovacorp.com",
+    password: "123456",
+    name: "Pedro Oliveira",
+    company: "InovaCorp",
+    phone: "(11) 7777-7777",
+    userType: "fabricante",
+    description: "Inovação em produtos industriais",
+    isActive: true,
+    createdAt: new Date()
+  },
+  {
+    id: 5,
+    email: "ana@distribuicoes.com",
+    password: "123456",
+    name: "Ana Costa",
+    company: "Distribuições Costa",
+    phone: "(11) 6666-6666",
+    userType: "revendedor",
+    description: "Distribuição de produtos eletrônicos",
+    isActive: true,
+    createdAt: new Date()
+  },
+  {
+    id: 6,
+    email: "carlos@megavendas.com",
+    password: "123456",
+    name: "Carlos Souza",
+    company: "Mega Vendas",
+    phone: "(11) 5555-4444",
+    userType: "revendedor",
+    description: "Revenda especializada em tecnologia",
+    isActive: true,
+    createdAt: new Date()
+  },
+  {
+    id: 7,
+    email: "lucia@comercialsp.com",
+    password: "123456",
+    name: "Lúcia Ferreira",
+    company: "Comercial SP",
+    phone: "(11) 4444-3333",
+    userType: "revendedor",
+    description: "Comércio atacadista",
+    isActive: true,
+    createdAt: new Date()
   }
 ];
 
@@ -198,6 +258,112 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           notes: "Discussão sobre novos produtos"
         }
       ]);
+    }
+
+    // Get daily schedule
+    if (path === '/schedule/daily' && req.method === 'GET') {
+      const selectedDate = req.query.date || new Date().toISOString().split('T')[0];
+      const currentUser = session.user;
+      
+      // Generate mock schedule data
+      const startTime = 8; // 8 AM
+      const endTime = 18; // 6 PM
+      const slotDuration = 30; // 30 minutes
+      const totalSlots = (endTime - startTime) * (60 / slotDuration);
+      
+      // Get fabricantes
+      const fabricantes = mockUsers.filter(u => u.userType === 'fabricante');
+      const revendedores = mockUsers.filter(u => u.userType === 'revendedor');
+      
+      // Generate mock meetings for the day
+      const mockDailyMeetings: any[] = [];
+      
+      // Create a more realistic schedule with some patterns
+      fabricantes.forEach((fabricante, fabricanteIndex) => {
+        // Each fabricante gets 2-4 meetings per day
+        const meetingsCount = 2 + Math.floor(Math.random() * 3);
+        const usedSlots = new Set();
+        
+        for (let i = 0; i < meetingsCount; i++) {
+          let slotIndex;
+          let attempts = 0;
+          // Try to find an available slot (avoid conflicts)
+          do {
+            slotIndex = Math.floor(Math.random() * totalSlots);
+            attempts++;
+          } while (usedSlots.has(slotIndex) && attempts < 10);
+          
+          if (attempts < 10) {
+            usedSlots.add(slotIndex);
+            
+            const hour = Math.floor(startTime + (slotIndex * slotDuration) / 60);
+            const minute = (slotIndex * slotDuration) % 60;
+            const meetingTime = new Date(`${selectedDate}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00`);
+            
+            const revendedor = revendedores[Math.floor(Math.random() * revendedores.length)];
+            const statuses = ['confirmed', 'pending', 'completed'];
+            const statusWeights = [0.5, 0.3, 0.2]; // More confirmed meetings
+            
+            let status = 'confirmed';
+            const random = Math.random();
+            if (random < statusWeights[2]) status = 'completed';
+            else if (random < statusWeights[1] + statusWeights[2]) status = 'pending';
+            
+            mockDailyMeetings.push({
+              id: mockDailyMeetings.length + 1,
+              eventId: 1,
+              fabricanteId: fabricante.id,
+              revendedorId: revendedor.id,
+              scheduledAt: meetingTime,
+              duration: slotDuration,
+              location: `Mesa ${fabricanteIndex + 1}${String.fromCharCode(65 + i)}`,
+              status: status,
+              notes: `Reunião sobre ${['produtos', 'parcerias', 'novos negócios', 'expansão'][Math.floor(Math.random() * 4)]}`
+            });
+          }
+        }
+      });
+      
+      // Sort meetings by time
+      mockDailyMeetings.sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
+      
+      // Filter meetings based on user type
+      let filteredMeetings = mockDailyMeetings;
+      let visibleFabricantes = fabricantes;
+      
+      if (currentUser.userType === 'fabricante') {
+        filteredMeetings = mockDailyMeetings.filter(m => m.fabricanteId === currentUser.id);
+        visibleFabricantes = fabricantes.filter(f => f.id === currentUser.id);
+      } else if (currentUser.userType === 'revendedor') {
+        filteredMeetings = mockDailyMeetings.filter(m => m.revendedorId === currentUser.id);
+        // For revendedores, show fabricantes they have meetings with
+        const fabricanteIds = new Set(filteredMeetings.map(m => m.fabricanteId));
+        visibleFabricantes = fabricantes.filter(f => fabricanteIds.has(f.id));
+      }
+      
+      // Generate time slots
+      const timeSlots: any[] = [];
+      for (let i = 0; i < totalSlots; i++) {
+        const hour = Math.floor(startTime + (i * slotDuration) / 60);
+        const minute = (i * slotDuration) % 60;
+        timeSlots.push({
+          time: `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`,
+          hour,
+          minute
+        });
+      }
+      
+      return res.status(200).json({
+        date: selectedDate,
+        timeSlots,
+        fabricantes: visibleFabricantes,
+        meetings: filteredMeetings,
+        settings: {
+          startTime,
+          endTime,
+          slotDuration
+        }
+      });
     }
 
     // Get events
